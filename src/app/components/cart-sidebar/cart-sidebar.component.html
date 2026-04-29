@@ -1,0 +1,93 @@
+@if (cartService.isOpen()) {
+  <div class="cart-overlay" (click)="cartService.closeCart()"></div>
+
+  <aside class="cart-sidebar">
+    <div class="cart-sidebar__header">
+      <div class="cart-header-left">
+        <h2>Your Cart</h2>
+        @if (cartService.totalItems() > 0) {
+          <span class="cart-count">{{ cartService.totalItems() }}</span>
+        }
+      </div>
+      <button class="cart-close" (click)="cartService.closeCart()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    @if (cartService.cartItems().length === 0) {
+      <div class="cart-empty">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5">
+          <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        <h3>Your cart is empty</h3>
+        <p>Add some products to get started</p>
+        <button class="btn-shop" (click)="cartService.closeCart()" routerLink="/products">
+          Shop Now
+        </button>
+      </div>
+    } @else {
+      <div class="cart-items">
+        @for (item of cartService.cartItems(); track item.product.id) {
+          <div class="cart-item">
+            <div class="cart-item__image">
+              <img [src]="item.product.thumbnail" [alt]="item.product.title" />
+            </div>
+            <div class="cart-item__info">
+              <h4>{{ item.product.title }}</h4>
+              <span class="cart-item__brand">{{ item.product.brand }}</span>
+              <div class="cart-item__price-row">
+                <span class="cart-item__price">${{ item.product.price | number:'1.2-2' }}</span>
+                <div class="qty-control">
+                  <button class="qty-btn" (click)="cartService.updateQuantity(item.product.id, item.quantity - 1)">−</button>
+                  <span>{{ item.quantity }}</span>
+                  <button class="qty-btn" (click)="cartService.updateQuantity(item.product.id, item.quantity + 1)">+</button>
+                </div>
+              </div>
+            </div>
+            <button class="cart-item__remove" (click)="cartService.removeFromCart(item.product.id)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6 6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="cart-footer">
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>${{ cartService.totalPrice() | number:'1.2-2' }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Shipping</span>
+            <span class="free">Free</span>
+          </div>
+          <div class="summary-row summary-row--total">
+            <span>Total</span>
+            <span>${{ cartService.totalPrice() | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <a
+          routerLink="/checkout"
+          class="btn-checkout"
+          (click)="cartService.closeCart()"
+        >
+          Proceed to Checkout
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+
+        <button class="btn-continue" (click)="cartService.closeCart()">
+          Continue Shopping
+        </button>
+      </div>
+    }
+  </aside>
+}

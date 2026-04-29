@@ -1,0 +1,161 @@
+@if (isLoading()) {
+  <div class="pdp-skeleton">
+    <div class="skeleton skeleton--images"></div>
+    <div class="skeleton-info">
+      <div class="skeleton skeleton--title"></div>
+      <div class="skeleton skeleton--text"></div>
+      <div class="skeleton skeleton--price"></div>
+    </div>
+  </div>
+} @else {
+  @if (product(); as p) {
+  <div class="pdp">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <div class="breadcrumb__container">
+        <a routerLink="/">Home</a>
+        <span>/</span>
+        <a routerLink="/products">Products</a>
+        <span>/</span>
+        <a [routerLink]="['/products']" [queryParams]="{category: p.category}">{{ p.category }}</a>
+        <span>/</span>
+        <span class="breadcrumb__current">{{ p.title }}</span>
+      </div>
+    </div>
+
+    <div class="pdp__container">
+      <!-- Images -->
+      <div class="pdp__gallery">
+        <div class="pdp__main-image">
+          <img [src]="selectedImage()" [alt]="p.title" />
+          @if (p.discountPercentage > 5) {
+            <span class="discount-badge">-{{ p.discountPercentage | number:'1.0-0' }}% OFF</span>
+          }
+        </div>
+        <div class="pdp__thumbnails">
+          <button
+            class="thumb"
+            [class.thumb--active]="selectedImage() === p.thumbnail"
+            (click)="selectImage(p.thumbnail)"
+          >
+            <img [src]="p.thumbnail" [alt]="p.title" />
+          </button>
+          @for (img of p.images; track img) {
+            <button
+              class="thumb"
+              [class.thumb--active]="selectedImage() === img"
+              (click)="selectImage(img)"
+            >
+              <img [src]="img" [alt]="p.title" />
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="pdp__info">
+        <span class="pdp__category">{{ p.category }}</span>
+        <h1 class="pdp__title">{{ p.title }}</h1>
+
+        <div class="pdp__rating">
+          <div class="stars">
+            @for (s of stars(p.rating); track s) {
+              <svg width="16" height="16" viewBox="0 0 24 24" [attr.fill]="s <= p.rating ? '#e8c547' : '#e5e7eb'" stroke="none">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+            }
+          </div>
+          <span class="rating-value">{{ p.rating }}</span>
+          <span class="rating-sep">·</span>
+          <span class="stock-label" [class.in-stock]="p.stock > 0">
+            {{ p.stock > 0 ? p.stock + ' in stock' : 'Out of stock' }}
+          </span>
+        </div>
+
+        <!-- Price -->
+        <div class="pdp__pricing">
+          <span class="pdp__price">${{ discountedPrice(p) | number:'1.2-2' }}</span>
+          @if (p.discountPercentage > 0) {
+            <span class="pdp__price-original">${{ p.price | number:'1.2-2' }}</span>
+            <span class="pdp__savings">You save ${{ savings(p) | number:'1.2-2' }}</span>
+          }
+        </div>
+
+        <p class="pdp__description">{{ p.description }}</p>
+
+        <div class="pdp__meta">
+          <div class="meta-item">
+            <span class="meta-label">Brand</span>
+            <span class="meta-value">{{ p.brand }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Category</span>
+            <span class="meta-value" style="text-transform:capitalize">{{ p.category }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">SKU</span>
+            <span class="meta-value">#{{ p.id.toString().padStart(6, '0') }}</span>
+          </div>
+        </div>
+
+        <!-- Quantity + CTA -->
+        <div class="pdp__actions">
+          <div class="qty-control">
+            <button class="qty-btn" (click)="decrementQty()">−</button>
+            <span class="qty-value">{{ quantity() }}</span>
+            <button class="qty-btn" (click)="incrementQty()">+</button>
+          </div>
+
+          <button
+            class="btn-add-cart"
+            [class.btn-add-cart--added]="addedToCart()"
+            (click)="addToCart()"
+            [disabled]="p.stock === 0"
+          >
+            @if (addedToCart()) {
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Added to Cart!
+            } @else {
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <path d="M16 10a4 4 0 0 1-8 0"/>
+              </svg>
+              Add to Cart
+            }
+          </button>
+
+          <button class="btn-buy-now" [disabled]="p.stock === 0" [routerLink]="['/checkout']">
+            Buy Now
+          </button>
+        </div>
+
+        <!-- Trust badges -->
+        <div class="trust-badges">
+          <div class="badge-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13" rx="2"/>
+              <path d="m16 8 5 0 2 5-1 4h-3M1 16h14"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+            <span>Free Shipping</span>
+          </div>
+          <div class="badge-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span>Secure Purchase</span>
+          </div>
+          <div class="badge-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
+            </svg>
+            <span>30-Day Returns</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+}

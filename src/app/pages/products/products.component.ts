@@ -1,0 +1,102 @@
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { DecimalPipe } from '@angular/common';
+import { ProductService } from '../../services/product.service';
+import { CartService } from '../../services/cart.service';
+import { Product } from '../../models/product.model';
+
+@Component({
+  selector: 'app-products',
+  standalone: true,
+  imports: [RouterLink, FormsModule, DecimalPipe],
+  templateUrl: './products.component.html',
+  styleUrl: './products.component.scss',
+})
+export class ProductsComponent implements OnInit {
+  private productService = inject(ProductService);
+  private cartService = inject(CartService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
+  allProducts = signal<Product[]>([]);
+  categories = signal<{ slug: string; name: string }[]>([]);
+  isLoading = signal(true);
+
+  selectedCategory = signal('');
+  searchQuery = signal('');
+  minPrice = signal<number | null>(null);
+  maxPrice = signal<number | null>(null);
+  sortBy = signal('default');
+  sidebarOpen = signal(false);
+
+  minPriceStr = '';
+  maxPriceStr = '';
+
+  filteredProducts = computed(() => {
+    let products = this.allProducts();
+    const cat = this.selectedCategory();
+    const search = this.searchQuery().toLowerCase();
+    const min = this.minPrice();
+    const max = this.maxPrice();
+
+    if (cat) products = products.filter(p => p.category === cat);
+    if (search) products = products.filter(p =>
+      p.title.toLowerCase().includes(search) || p.description.toLowerCase().includes(search)
+    );
+    if (min !== null) products = products.filter(p => p.price >= min);
+    if (max !== null) products = products.filter(p => p.price <= max);
+
+    const sort = this.sortBy();
+    if (sort === 'price-asc') products = [...products].sort((a, b) => a.price - b.price);
+    else if (sort === 'price-desc') products = [...products].sort((a, b) => b.price - a.price);
+    else if (sort === 'rating') products = [...products].sort((a, b) => b.rating - a.rating);
+    else if (sort === 'name') products = [...products].sort((a, b) => a.title.localeCompare(b.title));
+
+    return products;
+  });
+
+  ngOnInit(): void {
+    this.productService.getCategories().subscribe(cats => this.categories.set(cats));
+    this.productService.getProducts(100).subscribe(res => {
+      this.allProducts.set(res.products);
+      this.isLoading.set(false);
+    });
+
+    this.route.queryParams.subscribe(params => {
+      if (params['category']) this.selectedCategory.set(params['category']);
+      if (params['search']) this.searchQuery.set(params['search']);
+    });
+  }
+
+  selectCategory(slug: string): void {
+    this.selectedCategory.set(slug);
+    this.router.navigate([], { queryParams: { category: slug || null }, queryParamsHandling: 'merge' });
+  }
+
+  clearFilters(): void {
+    this.selectedCategory.set('');
+    this.searchQuery.set('');
+    this.minPrice.set(null);
+    this.maxPrice.set(null);
+    this.minPriceStr = '';
+    this.maxPriceStr = '';
+    this.sortBy.set('default');
+    this.router.navigate(['/products']);
+  }
+
+  applyPriceFilter(): void {
+    this.minPrice.set(this.minPriceStr ? parseFloat(this.minPriceStr) : null);
+    this.maxPrice.set(this.maxPriceStr ? parseFloat(this.maxPriceStr) : null);
+  }
+
+  addToCart(product: Product, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.cartService.addToCart(product);
+  }
+
+  discountedPrice(product: Product): number {
+    return product.price * (1 - product.discountPercentage / 100);
+  }
+}

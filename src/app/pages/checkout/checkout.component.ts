@@ -1,0 +1,90 @@
+import { Component, inject, signal, OnDestroy } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { DecimalPipe } from '@angular/common';
+import { CartService } from '../../services/cart.service';
+
+type CheckoutStep = 'address' | 'payment';
+
+@Component({
+  selector: 'app-checkout',
+  standalone: true,
+  imports: [RouterLink, FormsModule, DecimalPipe],
+  templateUrl: './checkout.component.html',
+  styleUrl: './checkout.component.scss',
+})
+export class CheckoutComponent implements OnDestroy {
+  cartService = inject(CartService);
+  private router = inject(Router);
+
+  step = signal<CheckoutStep>('address');
+  showSuccessModal = signal(false);
+  countdown = signal(5);
+  orderId = ('' + Date.now()).slice(-8);
+
+  private countdownInterval: ReturnType<typeof setInterval> | null = null;
+
+  address = {
+    fullName: '',
+    line1: '',
+    line2: '',
+    city: '',
+    state: '',
+    zip: '',
+    country: 'US',
+  };
+
+  payment = {
+    cardNumber: '',
+    cardName: '',
+    expiry: '',
+    cvv: '',
+  };
+
+  goToPayment(): void {
+    this.step.set('payment');
+    window.scrollTo(0, 0);
+  }
+
+  placeOrder(): void {
+    this.showSuccessModal.set(true);
+    this.cartService.clearCart();
+
+    this.countdownInterval = setInterval(() => {
+      this.countdown.update(v => v - 1);
+      if (this.countdown() <= 0) {
+        this.clearCountdown();
+        this.router.navigate(['/']);
+      }
+    }, 1000);
+  }
+
+  private clearCountdown(): void {
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+      this.countdownInterval = null;
+    }
+  }
+
+  formatCardNumber(value: string): string {
+    return value.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+  }
+
+  onCardNumberInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    input.value = this.formatCardNumber(input.value);
+    this.payment.cardNumber = input.value;
+  }
+
+  onExpiryInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let v = input.value.replace(/\D/g, '').slice(0, 4);
+    if (v.length >= 3) v = v.slice(0, 2) + '/' + v.slice(2);
+    input.value = v;
+    this.payment.expiry = v;
+  }
+
+  ngOnDestroy(): void {
+    this.clearCountdown();
+  }
+}
