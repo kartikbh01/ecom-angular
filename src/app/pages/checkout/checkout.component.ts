@@ -1,8 +1,9 @@
-import { Component, inject, signal, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnDestroy, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 
 type CheckoutStep = 'address' | 'payment';
 
@@ -13,8 +14,9 @@ type CheckoutStep = 'address' | 'payment';
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss',
 })
-export class CheckoutComponent implements OnDestroy {
+export class CheckoutComponent implements OnInit, OnDestroy {
   cartService = inject(CartService);
+  authService = inject(AuthService);
   private router = inject(Router);
 
   step = signal<CheckoutStep>('address');
@@ -23,6 +25,13 @@ export class CheckoutComponent implements OnDestroy {
   orderId = ('' + Date.now()).slice(-8);
 
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
+
+  ngOnInit() {
+    if (!this.authService.isLoggedIn()) {
+      this.authService.openModal('signin');
+      this.router.navigate(['/']);
+    }
+  }
 
   address = {
     fullName: '',

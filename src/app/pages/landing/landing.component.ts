@@ -4,6 +4,7 @@ import { DecimalPipe } from '@angular/common';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-landing',
@@ -15,6 +16,7 @@ import { Product } from '../../models/product.model';
 export class LandingComponent implements OnInit {
   private productService = inject(ProductService);
   private router = inject(Router);
+  private authService = inject(AuthService);
   cartService = inject(CartService);
 
   featuredProducts = signal<Product[]>([]);
@@ -41,6 +43,11 @@ export class LandingComponent implements OnInit {
   addToCart(product: Product, event: Event): void {
     event.stopPropagation();
     event.preventDefault();
+    if (!this.authService.isLoggedIn()) {
+      this.authService.openModal('signin');
+      return;
+    }
     this.cartService.addToCart(product);
   }
 }
+

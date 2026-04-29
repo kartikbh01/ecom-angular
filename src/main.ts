@@ -6,6 +6,7 @@ import { routes } from './app/app.routes';
 import { NavbarComponent } from './app/components/navbar/navbar.component';
 import { CartSidebarComponent } from './app/components/cart-sidebar/cart-sidebar.component';
 import { AuthModalComponent } from './app/components/auth-modal/auth-modal.component';
+import { client } from './lib/appwrite';
 
 @Component({
   selector: 'app-root',
@@ -26,4 +27,8 @@ bootstrapApplication(App, {
     provideRouter(routes),
     provideHttpClient(),
   ],
+}).then(() => {
+  client.ping()
+    .then(() => console.log('Appwrite connection verified successfully'))
+    .catch((err:any) => console.error('Failed to verify Appwrite connection:', err));
 });

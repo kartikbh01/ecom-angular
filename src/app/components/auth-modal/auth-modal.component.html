@@ -37,7 +37,7 @@
 
         <div class="form-group">
           <label>Email address</label>
-          <input type="email" placeholder="you@example.com" class="form-input" />
+          <input type="email" placeholder="you@example.com" class="form-input" [(ngModel)]="email" />
         </div>
 
         <div class="form-group">
@@ -46,7 +46,7 @@
             <a href="#" class="form-link">Forgot password?</a>
           </label>
           <div class="input-password">
-            <input [type]="showPassword() ? 'text' : 'password'" placeholder="Your password" class="form-input" />
+            <input [type]="showPassword() ? 'text' : 'password'" placeholder="Your password" class="form-input" [(ngModel)]="password" (keydown.enter)="onSubmit()" />
             <button class="toggle-pw" type="button" (click)="togglePassword()">
               @if (showPassword()) {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -62,7 +62,9 @@
           </div>
         </div>
 
-        <button class="btn-submit">Sign In</button>
+        <button class="btn-submit" (click)="onSubmit()" [disabled]="isLoading()">
+          {{ isLoading() ? 'Signing In...' : 'Sign In' }}
+        </button>
 
         <p class="modal__switch">
           Don't have an account?
@@ -77,23 +79,23 @@
         <div class="form-row">
           <div class="form-group">
             <label>First name</label>
-            <input type="text" placeholder="John" class="form-input" />
+            <input type="text" placeholder="John" class="form-input" [(ngModel)]="firstName" />
           </div>
           <div class="form-group">
             <label>Last name</label>
-            <input type="text" placeholder="Doe" class="form-input" />
+            <input type="text" placeholder="Doe" class="form-input" [(ngModel)]="lastName" />
           </div>
         </div>
 
         <div class="form-group">
           <label>Email address</label>
-          <input type="email" placeholder="you@example.com" class="form-input" />
+          <input type="email" placeholder="you@example.com" class="form-input" [(ngModel)]="email" />
         </div>
 
         <div class="form-group">
           <label>Password</label>
           <div class="input-password">
-            <input [type]="showPassword() ? 'text' : 'password'" placeholder="Create a strong password" class="form-input" />
+            <input [type]="showPassword() ? 'text' : 'password'" placeholder="Create a strong password" class="form-input" [(ngModel)]="password" (keydown.enter)="onSubmit()" />
             <button class="toggle-pw" type="button" (click)="togglePassword()">
               @if (showPassword()) {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -114,7 +116,9 @@
           <label for="terms">I agree to the <a href="#" class="form-link">Terms of Service</a> and <a href="#" class="form-link">Privacy Policy</a></label>
         </div>
 
-        <button class="btn-submit">Create Account</button>
+        <button class="btn-submit" (click)="onSubmit()" [disabled]="isLoading()">
+          {{ isLoading() ? 'Creating Account...' : 'Create Account' }}
+        </button>
 
         <p class="modal__switch">
           Already have an account?

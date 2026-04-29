@@ -5,6 +5,7 @@ import { DecimalPipe } from '@angular/common';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-products',
@@ -16,6 +17,7 @@ import { Product } from '../../models/product.model';
 export class ProductsComponent implements OnInit {
   private productService = inject(ProductService);
   private cartService = inject(CartService);
+  private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -93,6 +95,10 @@ export class ProductsComponent implements OnInit {
   addToCart(product: Product, event: Event): void {
     event.stopPropagation();
     event.preventDefault();
+    if (!this.authService.isLoggedIn()) {
+      this.authService.openModal('signin');
+      return;
+    }
     this.cartService.addToCart(product);
   }
 
@@ -100,3 +106,4 @@ export class ProductsComponent implements OnInit {
     return product.price * (1 - product.discountPercentage / 100);
   }
 }
+
