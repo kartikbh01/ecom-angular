@@ -26,6 +26,7 @@
       <a routerLink="/products" routerLinkActive="active" class="navbar__link">Products</a>
 
       @if (authService.isLoggedIn()) {
+        <a routerLink="/orders" routerLinkActive="active" class="navbar__link">Orders</a>
         <div class="navbar__user">
           <div class="user-avatar">
             {{ authService.currentUser()?.name?.charAt(0) ?? 'U' }}
@@ -70,6 +71,9 @@
         />
       </div>
       <a routerLink="/products" class="mobile-link" (click)="mobileMenuOpen.set(false)">Products</a>
+      @if (authService.isLoggedIn()) {
+        <a routerLink="/orders" class="mobile-link" (click)="mobileMenuOpen.set(false)">Orders</a>
+      }
       @if (!authService.isLoggedIn()) {
         <button class="navbar__btn-outline" (click)="authService.openModal('signin'); mobileMenuOpen.set(false)">Sign In</button>
         <button class="navbar__btn-primary" (click)="authService.openModal('signup'); mobileMenuOpen.set(false)">Sign Up</button>

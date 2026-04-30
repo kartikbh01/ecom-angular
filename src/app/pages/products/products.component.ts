@@ -25,7 +25,7 @@ export class ProductsComponent implements OnInit {
   categories = signal<{ slug: string; name: string }[]>([]);
   isLoading = signal(true);
 
-  selectedCategory = signal('');
+  selectedCategories = signal<string[]>([]);
   searchQuery = signal('');
   minPrice = signal<number | null>(null);
   maxPrice = signal<number | null>(null);
@@ -37,12 +37,12 @@ export class ProductsComponent implements OnInit {
 
   filteredProducts = computed(() => {
     let products = this.allProducts();
-    const cat = this.selectedCategory();
+    const cats = this.selectedCategories();
     const search = this.searchQuery().toLowerCase();
     const min = this.minPrice();
     const max = this.maxPrice();
 
-    if (cat) products = products.filter(p => p.category === cat);
+    if (cats.length > 0) products = products.filter(p => cats.includes(p.category));
     if (search) products = products.filter(p =>
       p.title.toLowerCase().includes(search) || p.description.toLowerCase().includes(search)
     );
@@ -66,18 +66,32 @@ export class ProductsComponent implements OnInit {
     });
 
     this.route.queryParams.subscribe(params => {
-      if (params['category']) this.selectedCategory.set(params['category']);
+      if (params['categories']) {
+        this.selectedCategories.set(params['categories'].split(','));
+      } else if (params['category']) {
+        this.selectedCategories.set([params['category']]);
+      }
       if (params['search']) this.searchQuery.set(params['search']);
     });
   }
 
-  selectCategory(slug: string): void {
-    this.selectedCategory.set(slug);
-    this.router.navigate([], { queryParams: { category: slug || null }, queryParamsHandling: 'merge' });
+  toggleCategory(slug: string): void {
+    if (!slug) {
+      this.selectedCategories.set([]);
+    } else {
+      const current = this.selectedCategories();
+      if (current.includes(slug)) {
+        this.selectedCategories.set(current.filter(c => c !== slug));
+      } else {
+        this.selectedCategories.set([...current, slug]);
+      }
+    }
+    const cats = this.selectedCategories();
+    this.router.navigate([], { queryParams: { categories: cats.length ? cats.join(',') : null, category: null }, queryParamsHandling: 'merge' });
   }
 
   clearFilters(): void {
-    this.selectedCategory.set('');
+    this.selectedCategories.set([]);
     this.searchQuery.set('');
     this.minPrice.set(null);
     this.maxPrice.set(null);

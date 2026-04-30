@@ -1,8 +1,11 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { CartItem, Product } from '../models/product.model';
+import { ToastService } from './toast.service';
+import { inject } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
+  private toastService = inject(ToastService);
   private items = signal<CartItem[]>([]);
   isOpen = signal(false);
 
@@ -24,6 +27,7 @@ export class CartService {
     } else {
       this.items.update(items => [...items, { product, quantity: 1 }]);
     }
+    this.toastService.success(`${product.title} added to cart!`);
   }
 
   removeFromCart(productId: number): void {

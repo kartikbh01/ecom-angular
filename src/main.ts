@@ -6,17 +6,19 @@ import { routes } from './app/app.routes';
 import { NavbarComponent } from './app/components/navbar/navbar.component';
 import { CartSidebarComponent } from './app/components/cart-sidebar/cart-sidebar.component';
 import { AuthModalComponent } from './app/components/auth-modal/auth-modal.component';
+import { ToastComponent } from './app/components/toast/toast.component';
 import { client } from './lib/appwrite';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, CartSidebarComponent, AuthModalComponent],
+  imports: [RouterOutlet, NavbarComponent, CartSidebarComponent, AuthModalComponent, ToastComponent],
   template: `
     <app-navbar></app-navbar>
     <router-outlet></router-outlet>
     <app-cart-sidebar></app-cart-sidebar>
     <app-auth-modal></app-auth-modal>
+    <app-toast></app-toast>
   `,
 })
 export class App {}

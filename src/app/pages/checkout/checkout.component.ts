@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
+import { OrderService } from '../../services/order.service';
 
 type CheckoutStep = 'address' | 'payment';
 
@@ -17,6 +18,7 @@ type CheckoutStep = 'address' | 'payment';
 export class CheckoutComponent implements OnInit, OnDestroy {
   cartService = inject(CartService);
   authService = inject(AuthService);
+  orderService = inject(OrderService);
   private router = inject(Router);
 
   step = signal<CheckoutStep>('address');
@@ -56,6 +58,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   placeOrder(): void {
+    const items = this.cartService.cartItems();
+    const total = this.cartService.totalPrice();
+
+    this.orderService.addOrder({
+      id: this.orderId,
+      items: items,
+      totalAmount: total,
+      date: new Date().toISOString(),
+      status: 'Processing'
+    });
+
     this.showSuccessModal.set(true);
     this.cartService.clearCart();
 

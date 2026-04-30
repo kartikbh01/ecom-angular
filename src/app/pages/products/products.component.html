@@ -14,7 +14,7 @@
         <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="14" y2="12"/><line x1="4" y1="18" x2="11" y2="18"/>
       </svg>
       Filters
-      @if (selectedCategory() || minPrice() || maxPrice()) {
+      @if (selectedCategories().length > 0 || minPrice() || maxPrice()) {
         <span class="filter-badge">!</span>
       }
     </button>
@@ -36,16 +36,16 @@
           <li>
             <button
               class="category-item"
-              [class.active]="selectedCategory() === ''"
-              (click)="selectCategory('')"
+              [class.active]="selectedCategories().length === 0"
+              (click)="toggleCategory('')"
             >All</button>
           </li>
           @for (cat of categories(); track cat.slug) {
             <li>
               <button
                 class="category-item"
-                [class.active]="selectedCategory() === cat.slug"
-                (click)="selectCategory(cat.slug)"
+                [class.active]="selectedCategories().includes(cat.slug)"
+                (click)="toggleCategory(cat.slug)"
               >{{ cat.name }}</button>
             </li>
           }
@@ -112,12 +112,12 @@
       </div>
 
       <!-- Active filters chips -->
-      @if (selectedCategory() || searchQuery() || minPrice() || maxPrice()) {
+      @if (selectedCategories().length > 0 || searchQuery() || minPrice() || maxPrice()) {
         <div class="active-filters">
-          @if (selectedCategory()) {
+          @for (cat of selectedCategories(); track cat) {
             <span class="filter-chip">
-              {{ selectedCategory() }}
-              <button (click)="selectCategory('')">×</button>
+              {{ cat }}
+              <button (click)="toggleCategory(cat)">×</button>
             </span>
           }
           @if (minPrice() || maxPrice()) {
