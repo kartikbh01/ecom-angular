@@ -55,15 +55,23 @@
   <div class="section-container">
     <div class="section-header">
       <h2 class="section-title">Shop by Category</h2>
-      <a routerLink="/products" class="section-link">View all</a>
     </div>
     <div class="categories__grid">
       @for (cat of categories(); track cat.slug) {
         <button class="category-card" (click)="navigateToCategory(cat.slug)">
-          <span class="category-card__name">{{ cat.name }}</span>
-          <svg class="category-card__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
+          <div class="category-card__image">
+            @if (cat.image) {
+              <img [src]="cat.image" [alt]="cat.name" loading="lazy">
+            } @else {
+              <div class="category-card__placeholder"></div>
+            }
+          </div>
+          <div class="category-card__content">
+            <span class="category-card__name">{{ cat.name }}</span>
+            <svg class="category-card__arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </div>
         </button>
       }
     </div>
@@ -125,7 +133,7 @@
 </section>
 
 <!-- Featured Products -->
-<section class="featured">
+<!-- <section class="featured">
   <div class="section-container">
     <div class="section-header">
       <h2 class="section-title">Featured Products</h2>
@@ -173,26 +181,10 @@
       }
     </div>
   </div>
-</section>
+</section> -->
 
 <!-- CTA Banner -->
-<section class="cta">
-  <div class="section-container">
-    <div class="cta__card">
-      <div class="cta__content">
-        <h2>Ready to start shopping?</h2>
-        <p>Join thousands of satisfied customers and find your perfect products today.</p>
-        <a routerLink="/products" class="btn btn--primary btn--lg">Shop Now</a>
-      </div>
-      <div class="cta__image">
-        <img
-          src="https://images.pexels.com/photos/4050315/pexels-photo-4050315.jpeg?auto=compress&cs=tinysrgb&w=600"
-          alt="Shopping bags"
-        />
-      </div>
-    </div>
-  </div>
-</section>
+
 
 <!-- Footer -->
 <footer class="footer">
@@ -216,14 +208,14 @@
           <li><a routerLink="/products" [queryParams]="{category: 'mens-shirts'}">Fashion</a></li>
         </ul>
       </div>
-      <div>
+      <!-- <div>
         <h4>Support</h4>
         <ul>
           <li><a href="#">Help Center</a></li>
           <li><a href="#">Track Order</a></li>
           <li><a href="#">Returns</a></li>
         </ul>
-      </div>
+      </div> -->
       <div>
         <h4>Company</h4>
         <ul>

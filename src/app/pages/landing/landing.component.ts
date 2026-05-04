@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
+import { forkJoin, map } from 'rxjs';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
@@ -20,7 +21,7 @@ export class LandingComponent implements OnInit {
   cartService = inject(CartService);
 
   featuredProducts = signal<Product[]>([]);
-  categories = signal<{ slug: string; name: string }[]>([]);
+  categories = signal<{ slug: string; name: string; image?: string }[]>([]);
 
   ngOnInit(): void {
     this.productService.getProducts(8).subscribe(res => {
@@ -28,7 +29,20 @@ export class LandingComponent implements OnInit {
     });
 
     this.productService.getCategories().subscribe(cats => {
-      this.categories.set(cats.slice(0, 8));
+      const topCats = cats.slice(0, 24);
+      
+      const requests = topCats.map(cat => 
+        this.productService.getProductsByCategory(cat.slug).pipe(
+          map(res => ({
+            ...cat,
+            image: res.products[0]?.thumbnail || ''
+          }))
+        )
+      );
+
+      forkJoin(requests).subscribe(catsWithImages => {
+        this.categories.set(catsWithImages);
+      });
     });
   }
 
