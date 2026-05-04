@@ -7,7 +7,17 @@
   </div>
 
   <div class="orders-body">
-    @if (orders().length === 0) {
+    @if (isLoading()) {
+      <div class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#e5e7eb" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke-dasharray="4 4">
+            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
+          </path>
+        </svg>
+        <h3>Loading your orders...</h3>
+      </div>
+    } @else if (orders().length === 0) {
       <div class="empty-state">
         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#e5e7eb" stroke-width="1.5">
           <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>

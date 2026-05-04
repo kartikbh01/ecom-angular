@@ -57,28 +57,36 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     window.scrollTo(0, 0);
   }
 
-  placeOrder(): void {
+  isPlacingOrder = signal(false);
+
+  async placeOrder(): Promise<void> {
     const items = this.cartService.cartItems();
     const total = this.cartService.totalPrice();
 
-    this.orderService.addOrder({
-      id: this.orderId,
-      items: items,
-      totalAmount: total,
-      date: new Date().toISOString(),
-      status: 'Processing'
-    });
+    this.isPlacingOrder.set(true);
+    
+    try {
+      await this.orderService.createOrder({
+        items: items,
+        totalAmount: total,
+        status: 'Processing'
+      });
 
-    this.showSuccessModal.set(true);
-    this.cartService.clearCart();
+      this.showSuccessModal.set(true);
+      this.cartService.clearCart();
 
-    this.countdownInterval = setInterval(() => {
-      this.countdown.update(v => v - 1);
-      if (this.countdown() <= 0) {
-        this.clearCountdown();
-        this.router.navigate(['/']);
-      }
-    }, 1000);
+      this.countdownInterval = setInterval(() => {
+        this.countdown.update(v => v - 1);
+        if (this.countdown() <= 0) {
+          this.clearCountdown();
+          this.router.navigate(['/']);
+        }
+      }, 1000);
+    } catch (e) {
+      console.error('Failed to place order', e);
+    } finally {
+      this.isPlacingOrder.set(false);
+    }
   }
 
   private clearCountdown(): void {

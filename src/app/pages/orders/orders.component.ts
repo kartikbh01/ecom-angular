@@ -20,20 +20,33 @@ export class OrdersComponent implements OnInit {
   private router = inject(Router);
   
   orders = signal<Order[]>([]);
+  isLoading = signal(true);
 
-  ngOnInit() {
+  async ngOnInit() {
     if (!this.authService.isLoggedIn()) {
       this.authService.openModal('signin');
       this.router.navigate(['/']);
       return;
     }
     
-    this.orders.set(this.orderService.getOrders());
+    try {
+      const fetchedOrders = await this.orderService.fetchOrders();
+      this.orders.set(fetchedOrders);
+    } catch (e) {
+      this.toastService.error('Failed to load orders.');
+    } finally {
+      this.isLoading.set(false);
+    }
   }
 
-  cancelOrder(orderId: string): void {
-    this.orderService.deleteOrder(orderId);
-    this.orders.set(this.orderService.getOrders());
-    this.toastService.success(`Order #${orderId} has been cancelled.`);
+  async cancelOrder(orderId: string): Promise<void> {
+    try {
+      await this.orderService.cancelOrder(orderId);
+      const fetchedOrders = await this.orderService.fetchOrders();
+      this.orders.set(fetchedOrders);
+      this.toastService.success(`Order has been cancelled.`);
+    } catch (e) {
+      this.toastService.error('Failed to cancel order.');
+    }
   }
 }

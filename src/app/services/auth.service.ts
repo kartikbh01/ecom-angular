@@ -7,7 +7,7 @@ export class AuthService {
   isModalOpen = signal(false);
   modalMode = signal<'signin' | 'signup'>('signin');
   isLoggedIn = signal(false);
-  currentUser = signal<{ name: string; email: string } | null>(null);
+  currentUser = signal<{ $id: string; name: string; email: string } | null>(null);
   private toastService = inject(ToastService);
 
   constructor() {
@@ -18,7 +18,7 @@ export class AuthService {
     try {
       const user = await account.get();
       this.isLoggedIn.set(true);
-      this.currentUser.set({ name: user.name, email: user.email });
+      this.currentUser.set({ $id: user.$id, name: user.name, email: user.email });
     } catch (e) {
       this.isLoggedIn.set(false);
       this.currentUser.set(null);

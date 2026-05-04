@@ -1,46 +1,66 @@
 import { Injectable, inject } from '@angular/core';
 import { Order } from '../models/order.model';
 import { AuthService } from './auth.service';
+import { databases, ID } from '../../lib/appwrite';
+import { Query } from 'appwrite';
+
+const DATABASE_ID = '69f30dc90029157900dd';
+const COLLECTION_ID = 'orders';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
   private authService = inject(AuthService);
   
-  getOrders(): Order[] {
+  async fetchOrders(): Promise<Order[]> {
     const user = this.authService.currentUser();
     if (!user) return [];
     
-    const allOrdersStr = localStorage.getItem('shoplux_orders');
-    const allOrders: Order[] = allOrdersStr ? JSON.parse(allOrdersStr) : [];
-    return allOrders
-      .filter(o => o.userId === user.email)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    try {
+      const response = await databases.listDocuments(DATABASE_ID, COLLECTION_ID, [
+        Query.equal('userId', user.$id),
+        Query.orderDesc('$createdAt')
+      ]);
+
+      return response.documents.map((doc: any) => ({
+        id: doc.$id,
+        userId: doc.userId,
+        items: JSON.parse(doc.items),
+        totalAmount: doc.totalPrice || doc.totalAmount, // handles potential typo from previous design
+        date: doc.$createdAt,
+        status: doc.status
+      })) as Order[];
+    } catch (e) {
+      console.error('Failed to fetch orders', e);
+      return [];
+    }
   }
 
-  addOrder(order: Omit<Order, 'userId'>): void {
+  async createOrder(order: Omit<Order, 'userId' | 'id' | 'date'>): Promise<void> {
     const user = this.authService.currentUser();
     if (!user) return;
     
-    const newOrder: Order = {
-      ...order,
-      userId: user.email
-    };
-    
-    const allOrdersStr = localStorage.getItem('shoplux_orders');
-    const allOrders: Order[] = allOrdersStr ? JSON.parse(allOrdersStr) : [];
-    allOrders.push(newOrder);
-    localStorage.setItem('shoplux_orders', JSON.stringify(allOrders));
+    try {
+      await databases.createDocument(DATABASE_ID, COLLECTION_ID, ID.unique(), {
+        userId: user.$id,
+        items: JSON.stringify(order.items),
+        totalPrice: order.totalAmount, // Our schema had totalPrice
+        status: order.status
+      });
+    } catch (e) {
+      console.error('Failed to create order', e);
+      throw e;
+    }
   }
 
-  deleteOrder(orderId: string): void {
+  async cancelOrder(orderId: string): Promise<void> {
     const user = this.authService.currentUser();
     if (!user) return;
 
-    const allOrdersStr = localStorage.getItem('shoplux_orders');
-    if (allOrdersStr) {
-      let allOrders: Order[] = JSON.parse(allOrdersStr);
-      allOrders = allOrders.filter(o => o.id !== orderId);
-      localStorage.setItem('shoplux_orders', JSON.stringify(allOrders));
+    try {
+      await databases.deleteDocument(DATABASE_ID, COLLECTION_ID, orderId);
+    } catch (e) {
+      console.error('Failed to cancel order', e);
+      throw e;
     }
   }
 }
