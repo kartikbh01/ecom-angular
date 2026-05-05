@@ -85,7 +85,9 @@
   margin: 0 8px;
   transition: background 0.3s;
 
-  &.done { background: #22c55e; }
+  &.done {
+    background: #22c55e;
+  }
 }
 
 .checkout-body {
@@ -126,7 +128,9 @@
   flex-direction: column;
   gap: 6px;
 
-  &--full { grid-column: 1 / -1; }
+  &--full {
+    grid-column: 1 / -1;
+  }
 
   label {
     font-size: 0.8rem;
@@ -145,7 +149,9 @@
   transition: border-color 0.2s, box-shadow 0.2s;
   background: #fff;
 
-  &::placeholder { color: #d1d5db; }
+  &::placeholder {
+    color: #d1d5db;
+  }
 
   &:focus {
     border-color: #1a1a2e;
@@ -165,7 +171,9 @@
 .card-input-wrap {
   position: relative;
 
-  .form-input { padding-right: 60px; }
+  .form-input {
+    padding-right: 60px;
+  }
 
   .card-icons {
     position: absolute;
@@ -218,6 +226,12 @@
     transform: translateY(-1px);
     box-shadow: 0 8px 20px rgba(26, 26, 46, 0.3);
   }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
 }
 
 .btn-back {
@@ -233,7 +247,9 @@
   padding: 0 0 20px;
   transition: color 0.2s;
 
-  &:hover { color: #1a1a2e; }
+  &:hover {
+    color: #1a1a2e;
+  }
 }
 
 .btn-place-order {
@@ -256,6 +272,12 @@
     background: #f0d260;
     transform: translateY(-1px);
     box-shadow: 0 8px 24px rgba(232, 197, 71, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 }
 
@@ -286,9 +308,18 @@
   max-height: 360px;
   overflow-y: auto;
 
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-track { background: #f9fafb; }
-  &::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 2px; }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f9fafb;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 2px;
+  }
 }
 
 .summary-item {
@@ -301,21 +332,25 @@
     width: 52px;
     height: 52px;
     border-radius: 8px;
-    overflow: hidden;
     background: #f9fafb;
     flex-shrink: 0;
     border: 1px solid #e5e7eb;
 
-    img { width: 100%; height: 100%; object-fit: cover; }
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 5px;
+    }
   }
 
   &__qty {
     position: absolute;
-    top: -6px;
+    top: -1px;
     right: -6px;
     min-width: 18px;
     height: 18px;
-    border-radius: 9px;
+    border-radius: 10px;
     background: #1a1a2e;
     color: #fff;
     font-size: 0.65rem;
@@ -382,7 +417,10 @@
   }
 }
 
-.free { color: #22c55e; font-weight: 600; }
+.free {
+  color: #22c55e;
+  font-weight: 600;
+}
 
 /* Success Modal */
 .success-overlay {
@@ -454,7 +492,9 @@
   color: #9ca3af;
   margin-bottom: 16px;
 
-  strong { color: #1a1a2e; }
+  strong {
+    color: #1a1a2e;
+  }
 }
 
 .success-progress {
@@ -474,24 +514,49 @@
 }
 
 @keyframes shrink {
-  from { transform: scaleX(1); }
-  to { transform: scaleX(0); }
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 @keyframes bounceIn {
-  0% { transform: scale(0); }
-  60% { transform: scale(1.15); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+
+  60% {
+    transform: scale(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 900px) {
@@ -500,12 +565,25 @@
     padding: 24px 16px 80px;
   }
 
-  .order-summary { position: static; }
-  .checkout-steps span:last-child { display: none; }
+  .order-summary {
+    position: static;
+  }
+
+  .checkout-steps span:last-child {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {
-  .form-grid { grid-template-columns: 1fr; }
-  .form-group--full { grid-column: 1; }
-  .checkout-form-section { padding: 20px; }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group--full {
+    grid-column: 1;
+  }
+
+  .checkout-form-section {
+    padding: 20px;
+  }
 }

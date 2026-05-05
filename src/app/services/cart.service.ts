@@ -27,7 +27,6 @@ export class CartService {
   );
 
   constructor() {
-    // Automatically load cart when user logs in, and clear when logged out
     effect(() => {
       const user = this.authService.currentUser();
       if (user) {

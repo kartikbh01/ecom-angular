@@ -46,7 +46,7 @@
             </div>
             
             <div class="order-card__items">
-              @for (item of order.items; track item.product.id) {
+              @for (item of order.items; track item.product.id; let i = $index) {
                 <div class="order-item">
                   <div class="order-item__image">
                     <img [src]="item.product.thumbnail" [alt]="item.product.title">
@@ -59,6 +59,21 @@
                   <div class="order-item__price">
                     ${{ (item.product.price * item.quantity) | number:'1.2-2' }}
                   </div>
+                  @if (order.status === 'Processing') {
+                    <div class="order-item__actions">
+                      <div class="qty-controls">
+                        <button class="qty-btn" (click)="updateQuantity(order, i, -1)" aria-label="Decrease quantity">-</button>
+                        <span class="qty-value">{{ item.quantity }}</span>
+                        <button class="qty-btn" (click)="updateQuantity(order, i, 1)" aria-label="Increase quantity">+</button>
+                      </div>
+                      <button class="remove-btn" (click)="removeItem(order, i)" aria-label="Remove item" title="Remove item">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <polyline points="3 6 5 6 21 6"></polyline>
+                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  }
                 </div>
               }
             </div>

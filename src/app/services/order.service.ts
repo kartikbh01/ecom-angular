@@ -63,4 +63,19 @@ export class OrderService {
       throw e;
     }
   }
+
+  async updateOrder(orderId: string, items: Order['items'], totalAmount: number): Promise<void> {
+    const user = this.authService.currentUser();
+    if (!user) return;
+
+    try {
+      await databases.updateDocument(DATABASE_ID, COLLECTION_ID, orderId, {
+        items: JSON.stringify(items),
+        totalPrice: totalAmount
+      });
+    } catch (e) {
+      console.error('Failed to update order', e);
+      throw e;
+    }
+  }
 }
